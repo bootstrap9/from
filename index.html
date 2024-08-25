@@ -1,0 +1,150 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form Submission</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- DataTables CSS -->
+    <link href="https://cdn.datatables.net/1.10.21/css/dataTables.bootstrap4.min.css" rel="stylesheet">
+</head>
+<body>
+
+<div class="container mt-5">
+    <div class="row">
+        <!-- Left side (Table) -->
+        <div class="col-lg-8 col-md-12 mb-4">
+            <h2>Data Table</h2>
+            <table id="data_table" class="table table-bordered table-responsive-sm">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Name</th>
+                        <th>Price</th>
+                        <th>Profile Pic</th>
+                       
+                    </tr>
+                </thead>
+               
+            </table>
+        </div>
+        <!-- Right side (Form) -->
+        <div class="col-lg-4 col-md-12">
+            <form id="form_submit">
+                <h2>Fill Data</h2>
+                <p class="hint-text">Fill the form below.</p>
+
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col">
+                            <input type="text" class="form-control" name="name" placeholder="Enter the Name" required="true">
+                        </div>
+                        
+                    </div>        	
+                </div>
+
+                <div class="form-group">
+                    <input type="number" class="form-control" name="price" placeholder="Enter Price" required="true" maxlength="10" pattern="[0-9]+">
+                </div>
+
+                  
+
+                <div class="form-group">
+                    <input type="file" class="form-control" name="profilepic" required="true">
+                    <span style="color:red; font-size:12px;">Only jpg / jpeg/ png /gif format allowed.</span>
+                </div>      
+
+                <div class="form-group">
+                    <button type="submit" class="btn btn-success btn-lg btn-block" name="submit">Submit</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- jQuery and Bootstrap JS -->
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<!-- DataTables JS -->
+<script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.21/js/dataTables.bootstrap4.min.js"></script>
+
+<script>
+
+    function fetch_data() {
+        $.ajax({
+            url: 'http://localhost/MYCURD/api.php', // The server-side script to handle the form submission
+            type: 'POST',
+            data: { type: "fetch" },
+            success: function(response) {
+                if (response.status) {
+                    var data = response.data;
+                    var tableBody = $('#data_table tbody');
+                    tableBody.empty(); // Clear existing rows
+                    
+                    // Loop through the response data and append each row to the table
+                    $.each(data, function(index, item) {
+                        var row = `<tr>
+                            <td>${item.id}</td>
+                            <td>${item.Name}</td>
+                            <td>${item.Price}</td>
+                            <td><img src="image/${item.ProfilePic}" alt="Profile Pic" width="50"></td>
+                        </tr>`;
+                        tableBody.append(row);
+                    });
+    
+                    // Reinitialize DataTable after populating it with new data
+                    $('#data_table').DataTable();
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                alert('Error: ' + error);
+            }
+        });
+    }
+    
+    
+    $(document).ready(function() {
+        // Initialize DataTable
+        $('#data_table').DataTable();
+    
+        $('#form_submit').on('submit', function(e) {
+            e.preventDefault(); // Prevent the default form submission
+    
+            var formData = new FormData(this);
+            formData.append('type', 'insert');
+    
+            $.ajax({
+                url: 'http://localhost/MYCURD/api.php', // The server-side script to handle the form submission
+                type: 'POST',
+                data: formData,
+                contentType: false, // Important: Required when using FormData
+                processData: false, // Important: Required when using FormData
+                success: function(response) {
+                    fetch_data();
+                    // Handle the server response here
+                    alert(response.message);
+                },
+                error: function(xhr, status, error) {
+                    // Handle any errors here
+                    alert('Error: ' + error);
+                }
+            });
+        });
+    
+    });
+    
+    $(document).ready(function() {
+        fetch_data();
+    });
+    
+    </script>
+    
+    </body>
+    </html>
+    
