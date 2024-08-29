@@ -55,78 +55,7 @@
 <script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.10.21/js/dataTables.bootstrap4.min.js"></script>
 
-<script>
 
-    function fetch_data() {
-        $.ajax({
-            url: 'http://localhost/MYCURD/api.php', // The server-side script to handle the form submission
-            type: 'POST',
-            data: { type: "fetch" },
-            success: function(response) {
-                if (response.status) {
-                    var data = response.data;
-                    var tableBody = $('#data_table tbody');
-                    tableBody.empty(); // Clear existing rows
-                    
-                    // Loop through the response data and append each row to the table
-                    $.each(data, function(index, item) {
-                        var row = `<tr>
-                            <td>${item.id}</td>
-                            <td>${item.Name}</td>
-                            <td>${item.Price}</td>
-                            <td><img src="image/${item.ProfilePic}" alt="Profile Pic" width="50"></td>
-                        </tr>`;
-                        tableBody.append(row);
-                    });
-    
-                    // Reinitialize DataTable after populating it with new data
-                    $('#data_table').DataTable();
-                } else {
-                    alert(response.message);
-                }
-            },
-            error: function(xhr, status, error) {
-                alert('Error: ' + error);
-            }
-        });
-    }
-    
-    
-    $(document).ready(function() {
-        // Initialize DataTable
-        $('#data_table').DataTable();
-    
-        $('#form_submit').on('submit', function(e) {
-            e.preventDefault(); // Prevent the default form submission
-    
-            var formData = new FormData(this);
-            formData.append('type', 'insert');
-    
-            $.ajax({
-                url: 'http://localhost/MYCURD/api.php', // The server-side script to handle the form submission
-                type: 'POST',
-                data: formData,
-                contentType: false, // Important: Required when using FormData
-                processData: false, // Important: Required when using FormData
-                success: function(response) {
-                    fetch_data();
-                    // Handle the server response here
-                    alert(response.message);
-                },
-                error: function(xhr, status, error) {
-                    // Handle any errors here
-                    alert('Error: ' + error);
-                }
-            });
-        });
-    
-    });
-    
-    $(document).ready(function() {
-        fetch_data();
-    });
-    
-    </script>
     
     </body>
     </html>
